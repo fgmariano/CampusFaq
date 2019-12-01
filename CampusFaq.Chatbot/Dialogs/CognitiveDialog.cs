@@ -35,6 +35,31 @@ namespace CampusFaq.Chatbot.Dialogs
         [LuisIntent("gradeHoraria")]
         public async Task GradeHoraria(IDialogContext context, LuisResult result)
         {
+            EntityRecommendation curso;
+            if (result.TryFindEntity("Curso", out curso))
+            {
+                if (curso.Entity == "análise e desenvolvimento de sistemas")
+                {
+
+                }
+                else if (curso.Entity == "gestão de empresas")
+                {
+
+                }
+                else if (curso.Entity == "polímeros")
+                {
+
+                }
+                else if (curso.Entity == "logística")
+                {
+
+                }
+                else if (curso.Entity == "comércio exterior")
+                {
+
+                }
+            }
+
             await context.PostAsync("a grade horária para o curso de adsfasdfasd.");
             context.Wait(MessageReceived);
         }
