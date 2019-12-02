@@ -14,7 +14,7 @@ namespace CampusFaq.Chatbot.Dialogs
         [LuisIntent("")]
         public async Task None(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Não entendi o seu pedido. pode repetir?");
+            await context.PostAsync("Não entendi. pode repetir?");
             context.Wait(MessageReceived);
         }
 
@@ -28,7 +28,8 @@ namespace CampusFaq.Chatbot.Dialogs
         [LuisIntent("atendimentoSecretaria")]
         public async Task AtendimentoSecretaria(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Os horários de atendimento da secretaria estão no site.");
+            await context.PostAsync("A secretaria está aberta de segunda a sexta em três turnos. Das 9h às 12h, " +
+                "15h30 às 17h30 e a noite das 18h30 às 20h30.");
             context.Wait(MessageReceived);
         }
 
@@ -67,7 +68,9 @@ namespace CampusFaq.Chatbot.Dialogs
         [LuisIntent("reservaBiblioteca")]
         public async Task ReservaBiblioteca(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("É possível reservar um livro na biblioteca por aqui.");
+            await context.PostAsync("É possível reservar um livro no balcão da biblioteca, você será avisado por telefone quando " +
+                "a obra estiver disponível e terá 24 horas pra ir lá e fazer o empréstimo, senão o próximo na lista de espera será " +
+                "chamado.");
             context.Wait(MessageReceived);
         }
 
