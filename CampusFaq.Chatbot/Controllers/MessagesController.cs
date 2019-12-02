@@ -20,7 +20,7 @@ namespace CampusFaq.Chatbot.Controllers
             {
                 try
                 {
-                    await Conversation.SendAsync(activity, () => new RootDialog());
+                    await Conversation.SendAsync(activity, () => new CognitiveDialog());
                 }
                 catch (Exception e)
                 {
@@ -38,7 +38,7 @@ namespace CampusFaq.Chatbot.Controllers
                     {
                         try
                         {
-                            await Conversation.SendAsync(activity, () => new RootDialog());
+                            await Conversation.SendAsync(activity, () => new CognitiveDialog());
                         }
                         catch (Exception e)
                         {

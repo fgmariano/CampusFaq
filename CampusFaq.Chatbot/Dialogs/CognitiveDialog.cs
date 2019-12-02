@@ -4,6 +4,7 @@ using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading.Tasks;
 using static CampusFaq.Chatbot.Class.cEnums;
 
@@ -15,28 +16,30 @@ namespace CampusFaq.Chatbot.Dialogs
     {
 
         #region Params
-        private string GRADE_ADS = "https://i.imgur.com/NQWwRNn.jpg";
-        private string GRADE_COMEX = "";
-        private string GRADE_GESTAO_RH = "";
-        private string GRADE_GESTAO_EMPRESARIAL = "";
-        private string GRADE_LOGISTICA = "";
-        private string GRADE_POLIMEROS = "";
+        private string GRADE_ADS = ConfigurationManager.AppSettings["grade_ads"];
+        private string GRADE_COMEX = ConfigurationManager.AppSettings["grade_comex"];
+        private string GRADE_GESTAO_RH = ConfigurationManager.AppSettings["grade_gestao_rh"];
+        private string GRADE_GESTAO_EMPRESARIAL = ConfigurationManager.AppSettings["grade_gestao_emp"];
+        private string GRADE_LOGISTICA = ConfigurationManager.AppSettings["grade_logistica"];
+        private string GRADE_POLIMEROS = ConfigurationManager.AppSettings["grade_polimeros"];
+        private string GRADE_PLASTICOS = ConfigurationManager.AppSettings["grade_plasticos"];
 
-        private string REGIME_DISCIPLINAR = "";
-        private string REGULAMENTO_GRADUACAO = "";
-        private string REGIMENTO_UNIFICADO = "";
-        private string SOLICITACAO_DOCUMENTO = "";
-        private string REQUERIMENTO_SECRETARIA = "";
-        private string REQUERIMENTO_GLOBAL = "";
-        private string REQUERIMENTO_DATA_PROVA = "";
-        private string REQUERIMENTO_DIRETOR = "";
-        private string REQUERIMENTO_COORDENADOR = "";
-        private string FORMULARIO_BILHETE = "";
-        private string FORMULARIO_BOM = "";
+        private string REGIME_DISCIPLINAR = ConfigurationManager.AppSettings["regime_disciplinar"];
+        private string REGULAMENTO_GRADUACAO = ConfigurationManager.AppSettings["regulamento_graduacao"];
+        private string REGIMENTO_UNIFICADO = ConfigurationManager.AppSettings["regimento_unificado"];
+        private string SOLICITACAO_DOCUMENTO = ConfigurationManager.AppSettings["solicitacao_documento"];
+        private string REQUERIMENTO_SECRETARIA = ConfigurationManager.AppSettings["requerimento_secretaria"];
+        private string REQUERIMENTO_GLOBAL = ConfigurationManager.AppSettings["requerimento_global"];
+        private string REQUERIMENTO_DATA_PROVA = ConfigurationManager.AppSettings["requerimento_data_prova"];
+        private string REQUERIMENTO_DIRETOR = ConfigurationManager.AppSettings["requerimento_diretor"];
+        private string REQUERIMENTO_COORDENADOR = ConfigurationManager.AppSettings["requerimento_coordenador"];
+        private string FORMULARIO_BILHETE = ConfigurationManager.AppSettings["formulario_bilhete"];
+        private string FORMULARIO_BOM = ConfigurationManager.AppSettings["formulario_bom"];
 
-        private string GRADE_ESTAGIO = "";
+        private string GRADE_ESTAGIO = ConfigurationManager.AppSettings["grade_estagio"];
         #endregion
 
+        #region Intents
         [LuisIntent("")]
         public async Task None(IDialogContext context, LuisResult result)
         {
@@ -75,34 +78,22 @@ namespace CampusFaq.Chatbot.Dialogs
             if (result.TryFindEntity("Curso", out curso))
             {
                 if (curso.Entity == "análise e desenvolvimento de sistemas")
-                {
-                    await context.PostAsync(criarGradeReply(context.MakeMessage(), "ADS"));
-                }
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.ADS));
                 else if (curso.Entity == "gestão de empresas")
-                {
-                    await context.PostAsync(criarGradeReply(context.MakeMessage(), "gestão empresarial"));
-                }
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.GESTAO_EMPRESARIAL));
                 else if (curso.Entity == "gestão de rh")
-                {
-                    await context.PostAsync(criarGradeReply(context.MakeMessage(), "gestão de RH"));
-                }
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.GESTAO_RH));
                 else if (curso.Entity == "polímeros")
-                {
-                    await context.PostAsync(criarGradeReply(context.MakeMessage(), "polimeros"));
-                }
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.POLIMEROS));
+                else if (curso.Entity == "plasticos")
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.PLASTICOS));
                 else if (curso.Entity == "logística")
-                {
-                    await context.PostAsync(criarGradeReply(context.MakeMessage(), "logistica"));
-                }
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.LOGISTICA));
                 else if (curso.Entity == "comércio exterior")
-                {
-                    await context.PostAsync(criarGradeReply(context.MakeMessage(), "COMEX"));
-                }
+                    await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.COMEX));
                 else
-                {
                     await context.PostAsync("Vc pode especificar o curso pra eu te mandar a grade horária? " +
                         "Ex: 'Quero a grade de ADS'");
-                }
             }
             context.Wait(MessageReceived);
         }
@@ -153,7 +144,9 @@ namespace CampusFaq.Chatbot.Dialogs
 
             context.Wait(MessageReceived);
         }
+        #endregion
 
+        #region Util methods
         private IMessageActivity criarDownloadDoc(IMessageActivity message, Documento doc)
         {
             string url = "";
@@ -216,41 +209,50 @@ namespace CampusFaq.Chatbot.Dialogs
             return message;
         }
 
-        private IMessageActivity criarGradeReply(IMessageActivity message, string curso)
+        private IMessageActivity criarGradeReply(IMessageActivity message, Curso curso)
         {
             Attachment img = new Attachment();
             img.ContentType = "image/png";
 
             switch (curso)
             {
-                case "ADS":
+                case Curso.ADS:
                     img.ContentUrl = GRADE_ADS;
+                    message.Text = $"Aqui está a grade horária do curso de ADS.";
                     break;
-                case "COMEX":
+                case Curso.COMEX:
+                    message.Text = $"Aqui está a grade horária do curso de COMEX.";
                     img.ContentUrl = GRADE_COMEX;
                     break;
-                case "logistica":
+                case Curso.LOGISTICA:
+                    message.Text = $"Aqui está a grade horária do curso de logística.";
                     img.ContentUrl = GRADE_LOGISTICA;
                     break;
-                case "gestão empresarial":
+                case Curso.GESTAO_EMPRESARIAL:
+                    message.Text = $"Aqui está a grade horária do curso de gestão empresarial.";
                     img.ContentUrl = GRADE_GESTAO_EMPRESARIAL;
                     break;
-                case "polimeros":
+                case Curso.POLIMEROS:
+                    message.Text = $"Aqui está a grade horária do curso de polímeros.";
                     img.ContentUrl = GRADE_POLIMEROS;
                     break;
-                case "gestão de RH":
+                case Curso.PLASTICOS:
+                    message.Text = $"Aqui está a grade horária do curso de produção de plásticos.";
+                    img.ContentUrl = GRADE_PLASTICOS;
+                    break;
+                case Curso.GESTAO_RH:
+                    message.Text = $"Aqui está a grade horária do curso de gestão de RH.";
                     img.ContentUrl = GRADE_GESTAO_RH;
                     break;
                 default:
                     break;
             }
 
-            message.Text = $"Aqui está a grade horária do curso de {curso}.";
             message.Attachments = new List<Attachment>();
             message.Attachments.Add(img);
 
             return message;
         }
-
+        #endregion
     }
 }
