@@ -6,15 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
-using static CampusFaq.Chatbot.Class.cEnums;
+using static CampusFaq.Bot.Class.cEnums;
 
-namespace CampusFaq.Chatbot.Dialogs
+namespace CampusFaq.Bot.Dialogs
 {
     [LuisModel("0f2e72b6-65dd-4217-9ee3-11a584e6be29", "7405ef826602457f8b015b619203e1ec")]
     [Serializable]
-    public class CognitiveDialog : LuisDialog<object>
+    public class RootDialog : LuisDialog<object>
     {
-
         #region Params
         private string GRADE_ADS = ConfigurationManager.AppSettings["grade_ads"];
         private string GRADE_COMEX = ConfigurationManager.AppSettings["grade_comex"];
@@ -85,24 +84,28 @@ namespace CampusFaq.Chatbot.Dialogs
             EntityRecommendation curso;
             if (result.TryFindEntity("Curso", out curso))
             {
-                if (curso.Entity == "análise e desenvolvimento de sistemas")
+                var arr = curso.Resolution["values"];
+                var text = ((List<object>)arr)[0].ToString();
+
+                if (text == "análise e desenvolvimento de sistemas")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.ADS));
-                else if (curso.Entity == "gestão de empresas")
+                else if (text == "gestão de empresas")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.GESTAO_EMPRESARIAL));
-                else if (curso.Entity == "gestão de rh")
+                else if (text == "gestão de rh")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.GESTAO_RH));
-                else if (curso.Entity == "polímeros")
+                else if (text == "polímeros")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.POLIMEROS));
-                else if (curso.Entity == "plasticos")
+                else if (text == "plasticos")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.PLASTICOS));
-                else if (curso.Entity == "logística")
+                else if (text == "logística")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.LOGISTICA));
-                else if (curso.Entity == "comércio exterior")
+                else if (text == "comércio exterior")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.COMEX));
                 else
                     await context.PostAsync("Vc pode especificar o curso pra eu te mandar a grade horária? " +
                         "Ex: 'Quero a grade de ADS'");
             }
+
             context.Wait(MessageReceived);
         }
 
@@ -121,27 +124,30 @@ namespace CampusFaq.Chatbot.Dialogs
             EntityRecommendation documento;
             if (result.TryFindEntity("Documento", out documento))
             {
-                if (documento.Entity == "regime disciplinar")
+                var arr = documento.Resolution["values"];
+                var text = ((List<object>)arr)[0].ToString();
+
+                if (text == "regime disciplinar")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REGIME_DISCIPLINAR));
-                else if (documento.Entity == "regulamento de graduação")
+                else if (text == "regulamento de graduação")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REGULAMENTO_GRADUACAO));
-                else if (documento.Entity == "regimento unificado")
+                else if (text == "regimento unificado")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REGIMENTO_UNIFICADO));
-                else if (documento.Entity == "requerimento para solicitação de documento")
+                else if (text == "requerimento para solicitação de documento")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.SOLICITACAO_DOCUMENTO));
-                else if (documento.Entity == "requerimento para a secretaria")
+                else if (text == "requerimento para a secretaria")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REQUERIMENTO_SECRETARIA));
-                else if (documento.Entity == "requerimento global")
+                else if (text == "requerimento global")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REQUERIMENTO_GLOBAL));
-                else if (documento.Entity == "requerimento data de prova")
+                else if (text == "requerimento data de prova")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REQUERIMENTO_DATA_PROVA));
-                else if (documento.Entity == "requerimento ao diretor")
+                else if (text == "requerimento ao diretor")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REQUERIMENTO_DIRETOR));
-                else if (documento.Entity == "requerimento ao coordenador")
+                else if (text == "requerimento ao coordenador")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.REQUERIMENTO_COORDENADOR));
-                else if (documento.Entity == "Formulário do bilhete único")
+                else if (text == "Formulário do bilhete único")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.FORMULARIO_BILHETE));
-                else if (documento.Entity == "Formulário do bilhete BOM")
+                else if (text == "Formulário do bilhete BOM")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.FORMULARIO_BOM));
             }
             else
