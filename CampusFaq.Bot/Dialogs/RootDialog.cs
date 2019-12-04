@@ -15,6 +15,8 @@ namespace CampusFaq.Bot.Dialogs
     public class RootDialog : LuisDialog<object>
     {
         #region Params
+        private static Random rnd = new Random();
+
         private string GRADE_ADS = ConfigurationManager.AppSettings["grade_ads"];
         private string GRADE_COMEX = ConfigurationManager.AppSettings["grade_comex"];
         private string GRADE_GESTAO_RH = ConfigurationManager.AppSettings["grade_gestao_rh"];
@@ -38,19 +40,68 @@ namespace CampusFaq.Bot.Dialogs
         private string GRADE_ESTAGIO = ConfigurationManager.AppSettings["grade_estagio"];
         #endregion
 
-        public override Task StartAsync(IDialogContext context)
-        {
-            context.Wait(MessageReceived);
-
-            return Task.CompletedTask;
-        }
-
         #region Intents
         [LuisIntent("")]
         [LuisIntent("None")]
         public async Task None(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Não entendi. pode repetir?");
+            var arr = new List<string>()
+            {
+                "Do que vc tá falando, bicho. Acho que eu não sei te responder essa.",
+                "Não entendi, pode repetir?",
+                "Tem certeza que eu deveria entender isso aí? Tenta repetir a pergunta pra mim ou perguntar outra coisa pf",
+                "Não compreendi vosso questionamento, pergunte-me acerca de tópicos de meu entendimento.",
+                "Sei lá, acho que eu não sei isso aí não. Me pergunta outra coisa."
+            };
+            int r = rnd.Next(arr.Count);
+
+            await context.PostAsync(arr[r]);
+            context.Wait(MessageReceived);
+        }
+
+        [LuisIntent("saudacoes")]
+        public async Task Saudacoes(IDialogContext context, LuisResult result)
+        {
+            var arr = new List<string>()
+            {
+                "Eai men, tudo bem?",
+                "Fala, meu consagrado. De boa?",
+                "Eai, meu camisa nove",
+                "Alô, alô",
+                "Positivo, meu operante",
+                "Oi, como vai vc?"
+            };
+            int r = rnd.Next(arr.Count);
+
+            await context.PostAsync(arr[r]);
+            context.Wait(MessageReceived);
+        }
+
+        [LuisIntent("tudoBem")]
+        public async Task TudoBem(IDialogContext context, LuisResult result)
+        {
+            var arr = new List<string>()
+            {
+                "Estou maravilhosamente bem tb, no que eu posso lhe ajudar hj?",
+                "Tô com sono mas tudo bem, do que vc precisa hj?",
+                "Estou de boa na lagoa",
+                "Suave na nave, chora",
+                "Entediado, precisa de algo?"
+            };
+            int r = rnd.Next(arr.Count);
+
+            await context.PostAsync(arr[r]);
+            context.Wait(MessageReceived);
+        }
+
+        [LuisIntent("sobre")]
+        public async Task Sobre(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("Eu sou um bot de atendimento que simula um primeiro atendimento a secretaria da FATEC. " +
+                "A ideia é que vc possa buscar comigo assuntos básicos como grade horária de cursos, modelos de documentos " +
+                "e outras informações que vc pode precisar mas que não valem uma ida na secretaria ou no próprio site da fatec." +
+                ". Experimenta perguntar pra mim algo sobre horários de atendimento de estágio ou secretaria, reserva na biblioteca" +
+                ", etc.");
             context.Wait(MessageReceived);
         }
 
@@ -161,6 +212,13 @@ namespace CampusFaq.Bot.Dialogs
         #endregion
 
         #region Util methods
+        public override Task StartAsync(IDialogContext context)
+        {
+            context.Wait(MessageReceived);
+
+            return Task.CompletedTask;
+        }
+
         private IMessageActivity criarDownloadDoc(IMessageActivity message, Documento doc)
         {
             string url = "";
