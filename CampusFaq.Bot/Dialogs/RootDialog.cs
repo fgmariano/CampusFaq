@@ -10,7 +10,7 @@ using static CampusFaq.Bot.Class.cEnums;
 
 namespace CampusFaq.Bot.Dialogs
 {
-    [LuisModel("0f2e72b6-65dd-4217-9ee3-11a584e6be29", "7405ef826602457f8b015b619203e1ec")]
+    [LuisModel("<appId>", "<secret>")]
     [Serializable]
     public class RootDialog : LuisDialog<object>
     {
@@ -118,6 +118,7 @@ namespace CampusFaq.Bot.Dialogs
             message.Attachments.Add(img);
 
             await context.PostAsync(message);
+            await context.PostAsync(AnotherQuestionAnswer());
             context.Wait(MessageReceived);
         }
 
@@ -126,6 +127,7 @@ namespace CampusFaq.Bot.Dialogs
         {
             await context.PostAsync("A secretaria está aberta de segunda a sexta em três turnos. Das 9h às 12h, " +
                 "15h30 às 17h30 e a noite das 18h30 às 20h30.");
+            await context.PostAsync(AnotherQuestionAnswer());
             context.Wait(MessageReceived);
         }
 
@@ -135,8 +137,8 @@ namespace CampusFaq.Bot.Dialogs
             EntityRecommendation curso;
             if (result.TryFindEntity("Curso", out curso))
             {
-                var arr = curso.Resolution["values"];
-                var text = ((List<object>)arr)[0].ToString();
+                var entities = curso.Resolution["values"];
+                var text = ((List<object>)entities)[0].ToString();
 
                 if (text == "análise e desenvolvimento de sistemas")
                     await context.PostAsync(criarGradeReply(context.MakeMessage(), Curso.ADS));
@@ -155,6 +157,8 @@ namespace CampusFaq.Bot.Dialogs
                 else
                     await context.PostAsync("Vc pode especificar o curso pra eu te mandar a grade horária? " +
                         "Ex: 'Quero a grade de ADS'");
+
+                await context.PostAsync(AnotherQuestionAnswer());
             }
 
             context.Wait(MessageReceived);
@@ -166,11 +170,12 @@ namespace CampusFaq.Bot.Dialogs
             await context.PostAsync("É possível reservar um livro no balcão da biblioteca, você será avisado por telefone quando " +
                 "a obra estiver disponível e terá 24 horas pra ir lá e fazer o empréstimo, senão o próximo na lista de espera será " +
                 "chamado.");
+            await context.PostAsync(AnotherQuestionAnswer());
             context.Wait(MessageReceived);
         }
 
-        [LuisIntent("documentosEstagio")]
-        public async Task DocumentosEstagio(IDialogContext context, LuisResult result)
+        [LuisIntent("documentoSecretaria")]
+        public async Task DocumentoSecretaria(IDialogContext context, LuisResult result)
         {
             EntityRecommendation documento;
             if (result.TryFindEntity("Documento", out documento))
@@ -200,6 +205,8 @@ namespace CampusFaq.Bot.Dialogs
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.FORMULARIO_BILHETE));
                 else if (text == "Formulário do bilhete BOM")
                     await context.PostAsync(criarDownloadDoc(context.MakeMessage(), Documento.FORMULARIO_BOM));
+
+                await context.PostAsync(AnotherQuestionAnswer());
             }
             else
             {
@@ -207,6 +214,13 @@ namespace CampusFaq.Bot.Dialogs
                     "Ex: 'quero o regulamento de graduação'");
             }
 
+            context.Wait(MessageReceived);
+        }
+
+        [LuisIntent("tchau")]
+        public async Task Tchau(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync(EndingConversation());
             context.Wait(MessageReceived);
         }
         #endregion
@@ -217,6 +231,32 @@ namespace CampusFaq.Bot.Dialogs
             context.Wait(MessageReceived);
 
             return Task.CompletedTask;
+        }
+
+        private string AnotherQuestionAnswer()
+        {
+            var arr = new List<string>()
+            {
+                "Posso lhe ajudar em mais alguma coisa hoje?",
+                "Precisa de mais alguma coisa?",
+                "Outra dúvida?",
+                "Alguma outra dúvida?",
+                "Mais alguma coisa?"
+            };
+            int r = rnd.Next(arr.Count);
+            return arr[r];
+        }
+
+        private string EndingConversation()
+        {
+            var arr = new List<string>()
+            {
+                "Ok, estou sempre a disposição.",
+                "Beleza, qualquer dúvida vc pode me chamar.",
+                "Show, qualquer dúvida pode me mandar um oi quando quiser."
+            };
+            int r = rnd.Next(arr.Count);
+            return arr[r];
         }
 
         private IMessageActivity criarDownloadDoc(IMessageActivity message, Documento doc)
